@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<configuration version="1.0.0">
+    <Logging>
+        <Defaults>
+            <!-- 
+                Logging levels are (in noisy -> least order)
+                    * Verbose
+                    * Debug
+                    * Information
+                    * Warning
+                    * Error
+                    * Fatal
+                
+                The default logging level should be at Verbose, as it overrides the following modules if they are set lower
+             -->
+            <Verbosity>Verbose</Verbosity>
+            <Format>{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}</Format>
+        </Defaults>
+        <File>
+            <enabled>1</enabled>
+            <Verbosity>Verbose</Verbosity>
+            <Logfile>SMTP.log</Logfile>
+            <Format>{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}</Format>
+            <Rollover When='Day' Retains="31"></Rollover>
+                <!-- 
+                    The When options the roll over to occur on the Minute, Hour, Day, Month, Year, keep for Infinitie
+                    The Retains option, is how many previous logs to keep
+                 -->
+        </File>
+        <Console>
+            <enabled>1</enabled>
+            <Verbosity>Verbose</Verbosity>
+            <Format>[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}</Format>
+        </Console>
+        <EventLogs>
+            <!-- *** CURRENTLY BROKEN. DO NOT USE *** -->
+            <enabled>0</enabled>
+            <EventLog>SMTP</EventLog>
+            <Verbosity>Verbose</Verbosity>
+            <Format>{Message}{NewLine}{Exception}{ErrorRecord}</Format>
+        </EventLogs>
+        <PowerShell>
+            <enabled>0</enabled>
+            <Verbosity>Verbose</Verbosity>
+            <Format>[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}</Format>
+        </PowerShell>
+    </Logging>
+    <Server>
+        <hostname>macmini.home.local</hostname>
+        <Listening>
+            <IPaddress>0.0.0.0</IPaddress>
+            <Port>25</Port>
+        </Listening>
+        <MaxThreads>50</MaxThreads>
+    </Server>
+</configuration>
