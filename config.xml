@@ -47,6 +47,8 @@
     </Logging>
     <Server>
         <hostname>macmini.home.local</hostname>
+        <!-- Maximum size allowed to be received by the service. Size of 0 means no limit. -->
+        <MaxSizeKB>9</MaxSizeKB>
         <Listening>
             <IPaddress>0.0.0.0</IPaddress>
             <Port>25</Port>
