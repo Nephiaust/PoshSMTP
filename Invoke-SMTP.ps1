@@ -120,16 +120,6 @@ Function Invoke-EndCleanup {
   exit
 }
 
-Function Show-StringCharacters{
-  param(
-    [Parameter(Mandatory)]$String
-  )
-  $TempChars = $String.ToCharArray()
-  Foreach ($Character in $TempChars){
-    $LoggingOutput = "New char is " + $Character + " -- " + [Int32]$Character
-    Write-Host $LoggingOutput
-  }
-}
 Function Invoke-SMTPD_NOOP {
   param (
     [Parameter(Mandatory)][string]$UserCommand
