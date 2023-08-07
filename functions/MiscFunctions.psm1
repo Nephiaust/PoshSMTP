@@ -75,8 +75,7 @@ Function Show-StringCharacters{
         You can pipe a string that contains a path to Get-VSCodeSnippet.
     .NOTES
         This is more for testing than being useful.
-    #>
-    
+    #>    
     [CmdletBinding()]
     param(
       [Parameter(Mandatory=$true,
