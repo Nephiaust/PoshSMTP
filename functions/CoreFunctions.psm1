@@ -59,11 +59,7 @@ Function New-SMTPD {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    HelpMessage='The inbound TCP Client Connection from the client')]
-        [System.Net.Sockets.TcpClient]
-        $TCPClient
+        [Parameter(Mandatory=$true,HelpMessage='The inbound TCP Client Connection from the client')][System.Net.Sockets.TcpClient]$TCPClient
     )
     Write-InformationLog "Incoming connection logged from $($TCPClient.Client.RemoteEndPoint.Address):$($TCPClient.Client.RemoteEndPoint.Port)"
   
@@ -96,13 +92,13 @@ Function Invoke-SMTPD_Start {
 
         if ($TCPStream.DataAvailable) {
             # Needs to receive the CR and LF line terminators
-            $NotReceivedCR = $NoReceivedLF = $true
-            While ($NotReceivedCR -and $NoReceivedLF) {
-                $Inoput = $TCPStream.ReadByte()
-                switch ($Inoput) {
-                    13 { $NoReceivedLF = $false; break }
-                    10 { $NotReceivedCR = $false; break }
-                    default { $UserInput += [char]$Inoput; break }
+            $ReceivedCRLF = 0
+            While ($ReceivedCRLF -ne 2) {
+                $UserCharInput = $TCPStream.ReadByte()
+                switch ($UserCharInput) {
+                    10 { $ReceivedCRLF++; break }
+                    13 { $ReceivedCRLF++; break }
+                    default { $UserInput += [char]$UserCharInput; break }
                 }
             }
         }
@@ -151,11 +147,7 @@ Function Invoke-SMTPD_VRFY {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    HelpMessage='The full command entered by the client')]
-        [String]
-        $UserCommand
+        [Parameter(Mandatory=$true,HelpMessage='The full command entered by the client')][String]$UserCommand
     )
     Write-VerboseLog 'VRFY command was invalid'
     $ResponseMSG = "502 Command not implemented yet`r`n"
@@ -173,11 +165,7 @@ Function Invoke-SMTPD_EXPN {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    HelpMessage='The full command entered by the client')]
-        [String]
-        $UserCommand
+        [Parameter(Mandatory=$true,HelpMessage='The full command entered by the client')][String]$UserCommand
     )
     Write-VerboseLog 'Received a EXPN command.'
     $ResponseMSG = "502 Command not implemented yet`r`n"
@@ -212,10 +200,7 @@ Function Invoke-SMTPD_RSET {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$false,
-                    ValueFromPipeline=$true,
-                    HelpMessage='Is this a full reset, so all current client commands are cleared.')]
-        [Switch]$Full
+        [Parameter(Mandatory=$false,HelpMessage='Is this a full reset, so all current client commands are cleared.')][Switch]$Full
     )
     Write-VerboseLog 'Received a RSET command. Doing nothing'
     if ($UserInput.length -gt 4) {
@@ -244,11 +229,7 @@ Function Invoke-SMTPD_QUIT {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    HelpMessage='The full command entered by the client')]
-        [String]
-        $UserCommand
+        [Parameter(Mandatory=$true,HelpMessage='The full command entered by the client')][String]$UserCommand
     )
     Write-VerboseLog 'Received a QUIT command. Quiting session with client'
     if ($UserInput.length -gt 4) {
@@ -277,11 +258,7 @@ Function Invoke-SMTPD_NOOP {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    HelpMessage='The full command entered by the client')]
-        [String]
-        $UserCommand
+        [Parameter(Mandatory=$true,HelpMessage='The full command entered by the client')][String]$UserCommand
     )
     Write-VerboseLog 'Received a NOOP command. Doing nothing'
     if ($UserCommand.Length -gt 5) {
