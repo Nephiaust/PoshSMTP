@@ -69,7 +69,11 @@ Import-Module ./functions/MiscFunctions.psm1
 
 $LoggingOutput = 'Loading SMTP HELO functions module.'
 Write-InformationLog $LoggingOutput
-Import-Module ./functions/SMTPD_HelloFunctions.psm1
+Import-Module ./functions/SMTPD_HeloFunctions.psm1
+
+$LoggingOutput = 'Loading SMTP EHLO functions module.'
+Write-InformationLog $LoggingOutput
+Import-Module ./functions/SMTPD_EhloFunctions.psm1
 
 # *******************************************************
 # *******************************************************
@@ -130,39 +134,6 @@ Function Invoke-EndCleanup {
   $LoadedModules = Get-Module
   ForEach ($ModuleLoaded in (Compare-Object -ReferenceObject $CurrentModules -DifferenceObject $LoadedModules)) { Remove-Module $ModuleLoaded.InputObject }
   exit
-}
-
-Function Invoke-SMTPD_HELO {
-  param (
-    [Parameter(Mandatory)][string]$UserCommand
-  )
-  Write-VerboseLog 'Received a HELO command.'
-  if ($UserInput.length -lt 5){
-    Write-VerboseLog 'HELO command was invalid'
-    $ResponseMSG = "501 Requested action not taken: Syntax error`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG = "250 Welcome " + $UserCommand.Substring(5,($UserCommand.Length - 5)) + ". I am ready`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-}
-
-Function Invoke-SMTPD_EHLO {
-  param (
-    [Parameter(Mandatory)][string]$UserCommand
-  )
-  Write-VerboseLog 'Received a EHLO command.'
-  if ($UserInput.length -lt 5){
-    Write-VerboseLog 'EHLO command was invalid'
-    $ResponseMSG = "550 Requested action not taken: Syntax error`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG  = "250-" + $Settings.Server.Hostname +" welcomes " + $UserCommand.Substring(5,($UserCommand.Length - 5)) + "`r`n"
-    # If the max size has been set, tell the client what it is.
-    If ($Settings.Server.MaxSizeKB.ToInt32($null) -gt 0) {$ResponseMSG += "250-SIZE " + ($Settings.Server.MaxSizeKB.ToInt32($null) * 1024) + "`r`n"}
-    $ResponseMSG += "250 HELP`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
 }
 
 Function FakeTelnet {
