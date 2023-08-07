@@ -156,6 +156,7 @@ Function Invoke-SMTPD_VRFY {
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
         [ValidateNotNullOrEmpty]
+        [String]
         $UserCommand
     )
     Write-VerboseLog 'VRFY command was invalid'
@@ -178,6 +179,7 @@ Function Invoke-SMTPD_EXPN {
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
         [ValidateNotNullOrEmpty]
+        [String]
         $UserCommand
     )
     Write-VerboseLog 'Received a EXPN command.'
@@ -249,6 +251,7 @@ Function Invoke-SMTPD_QUIT {
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
         [ValidateNotNullOrEmpty]
+        [String]
         $UserCommand
     )
     Write-VerboseLog 'Received a QUIT command. Quiting session with client'
@@ -282,6 +285,7 @@ Function Invoke-SMTPD_NOOP {
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
         [ValidateNotNullOrEmpty]
+        [String]
         $UserCommand
     )
     Write-VerboseLog 'Received a NOOP command. Doing nothing'
