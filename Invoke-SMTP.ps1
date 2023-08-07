@@ -1,5 +1,6 @@
 #Requires -Version 5.1
 #Requires -Modules PoShLog
+#Requires -Modules PSSQLite
 
 $Settings = ([xml](Get-Content ./config.xml)).configuration
 $AppDetails = @{

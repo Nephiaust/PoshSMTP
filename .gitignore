@@ -1,2 +1,9 @@
 *.log
 **/logs
+*.sqlite
+
+# Ignore the MAC DS_Store crap file.
+.DS_Store
+**/.DS_Store
+._.DS_Store
+**/._.DS_Store
