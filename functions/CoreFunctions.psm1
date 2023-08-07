@@ -62,7 +62,6 @@ Function New-SMTPD {
         [Parameter(Mandatory=$true,
                     ValueFromPipeline=$true,
                     HelpMessage='The inbound TCP Client Connection from the client')]
-        [ValidateNotNullOrEmpty]
         [System.Net.Sockets.TcpClient]
         $TCPClient
     )
@@ -155,7 +154,6 @@ Function Invoke-SMTPD_VRFY {
         [Parameter(Mandatory=$true,
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
-        [ValidateNotNullOrEmpty]
         [String]
         $UserCommand
     )
@@ -178,7 +176,6 @@ Function Invoke-SMTPD_EXPN {
         [Parameter(Mandatory=$true,
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
-        [ValidateNotNullOrEmpty]
         [String]
         $UserCommand
     )
@@ -250,7 +247,6 @@ Function Invoke-SMTPD_QUIT {
         [Parameter(Mandatory=$true,
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
-        [ValidateNotNullOrEmpty]
         [String]
         $UserCommand
     )
@@ -284,7 +280,6 @@ Function Invoke-SMTPD_NOOP {
         [Parameter(Mandatory=$true,
                     ValueFromPipeline=$true,
                     HelpMessage='The full command entered by the client')]
-        [ValidateNotNullOrEmpty]
         [String]
         $UserCommand
     )

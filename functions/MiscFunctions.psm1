@@ -81,7 +81,6 @@ Function Show-StringCharacters{
       [Parameter(Mandatory=$true,
                 ValueFromPipeline=$true,
                 HelpMessage='The string to display as individual characters & value.')]
-      [ValidateNotNullOrEmpty]
       $String
     )
     $TempChars = $String.ToCharArray()

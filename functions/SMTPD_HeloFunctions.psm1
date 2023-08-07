@@ -63,7 +63,6 @@ Function Invoke-SMTPD_HELO {
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             HelpMessage = 'The full command entered by the client')]
-        [ValidateNotNullOrEmpty]
         [String]
         $UserCommand
     )
