@@ -59,6 +59,18 @@ Invoke-Expression $LoggingCommand
 $LoggingOutput += ' modules.'
 Write-InformationLog $LoggingOutput
 
+$LoggingOutput = 'Loading core functions module.'
+Write-InformationLog $LoggingOutput
+Import-Module ./functions/CoreFunctions.psm1
+
+$LoggingOutput = 'Loading misc functions module.'
+Write-InformationLog $LoggingOutput
+Import-Module ./functions/MiscFunctions.psm1
+
+$LoggingOutput = 'Loading SMTP HELO functions module.'
+Write-InformationLog $LoggingOutput
+Import-Module ./functions/SMTPD_HelloFunctions.psm1
+
 # *******************************************************
 # *******************************************************
 # **                                                   **
@@ -120,51 +132,6 @@ Function Invoke-EndCleanup {
   exit
 }
 
-Function Invoke-SMTPD_NOOP {
-  param (
-    [Parameter(Mandatory)][string]$UserCommand
-  )
-  Write-VerboseLog 'Received a NOOP command. Doing nothing'
-  if ($UserCommand.Length -gt 5) {
-    $ResponseMSG = "250 Okay, not doing '" + $UserCommand.Substring(5,($UserCommand.Length - 5)) + "'`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG = "250 Okay, doing nothing`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-}
-
-Function Invoke-SMTPD_RSET {
-  param (
-    [Switch]$Full
-  )
-  Write-VerboseLog 'Received a RSET command. Doing nothing'
-  if ($UserInput.length -gt 4){
-    Write-VerboseLog 'RSET command was invalid'
-    $ResponseMSG = "500 Syntax error, command unrecognized`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG = "250 OK`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-  If ($Full) {Invoke-SMTPD_Start}
-}
-
-Function Invoke-SMTPD_QUIT {
-  param (
-    [Parameter(Mandatory)][string]$UserCommand
-  )
-  Write-VerboseLog 'Received a QUIT command. Quiting session with client'
-  if ($UserInput.length -gt 4){
-    Write-VerboseLog 'QUIT command was invalid'
-    $ResponseMSG = "500 Syntax error, command unrecognized`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG = "221 OK`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-}
-
 Function Invoke-SMTPD_HELO {
   param (
     [Parameter(Mandatory)][string]$UserCommand
@@ -195,119 +162,6 @@ Function Invoke-SMTPD_EHLO {
     If ($Settings.Server.MaxSizeKB.ToInt32($null) -gt 0) {$ResponseMSG += "250-SIZE " + ($Settings.Server.MaxSizeKB.ToInt32($null) * 1024) + "`r`n"}
     $ResponseMSG += "250 HELP`r`n"
     $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-}
-
-Function Invoke-SMTPD_VRFY {
-  param (
-    [Parameter(Mandatory)][string]$UserCommand
-  )
-  Write-VerboseLog 'Received a VRFY command.'
-  if ($UserInput.length -lt 5){
-    Write-VerboseLog 'VRFY command was invalid'
-    $ResponseMSG = "550 Requested action not taken: Syntax error`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG = "502 Command not implemented yet`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-}
-
-Function Invoke-SMTPD_EXPN {
-  param (
-    [Parameter(Mandatory)][string]$UserCommand
-  )
-  Write-VerboseLog 'Received a EXPN command.'
-  if ($UserInput.length -lt 5){
-    Write-VerboseLog 'EXPN command was invalid'
-    $ResponseMSG = "550 Requested action not taken: Syntax error`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  } else {
-    $ResponseMSG = "502 Command not implemented yet`r`n"
-    $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  }
-}
-
-Function Close-SMTP {
-  $TCPClient.Close()
-  $MyStatus.Continue = $false
-}
-
-Function New-SMTPD {
-  param (
-    [Parameter(Mandatory)][System.Net.Sockets.TcpClient]$TCPClient
-  )
-  Write-InformationLog "Incoming connection logged from $($TCPClient.Client.RemoteEndPoint.Address):$($TCPClient.Client.RemoteEndPoint.Port)"
-
-  Write-DebugLog 'Creating new TCP Stream to communicate on'
-  $TCPStream = $TCPClient.GetStream()
-  $ResponseMSG = "220-Welcome to " + $Settings.Server.Hostname + ".`r`n"
-  $ResponseMSG += "220 Running " + $AppDetails.Name + " ver: " + $AppDetails.Version + "`r`n"
-  $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-  Invoke-SMTPD_Start
-  Close-SMTP
-}
-Function Invoke-SMTPD_Start {
-  $Continue = $true
-  While ($Continue) {
-    [String]$UserInput = $null
-    while (!$TCPStream.DataAvailable) {
-      Start-Sleep -Milliseconds 100
-    }
-    if ($TCPStream.DataAvailable) {
-      $ReceivingData = $true
-      While ($ReceivingData){
-        $Inoput = $TCPStream.ReadByte()
-        switch ($Inoput){
-          13 {break}
-          10 {$ReceivingData=$false;break}
-          default {$UserInput += [char]$Inoput;break}
-        }
-      }
-    }
-    # Cleaning up the input to remove any trailing spaces.
-    $UserInput = $UserInput.TrimEnd()
-
-    # Verifying that the input is 4 or more characters
-    if ($UserInput.Length -gt 3) {
-      Switch ($UserInput.substring(0,4)){
-        "help" {
-          Write-VerboseLog 'Received a HELP command. Sending help'
-          $ResponseMSG  = "200-Available commands in this context EHLO, EXPN, HELO, HELP, NOOP, QUIT, RSET, VRFY`r`n"
-          $ResponseMSG += "200 Not available commands DATA, MAIL, RCPT`r`n"
-          $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-          break
-        }
-        
-        # QUIT must be by itself. RFC5321 says its SHOULD be, but we are being stupid about it.
-        "quit" {Invoke-SMTPD_QUIT -Usercommand $UserInput;$Continue = $false;break}
-        
-        # RSET must be by itself. RFC5321 says its SHOULD be, but we are being stupid about it.
-        "rset" {Invoke-SMTPD_RSET -Usercommand $UserInput;break}
-
-        # Do nothing
-        "noop" {Invoke-SMTPD_NOOP -Usercommand $UserInput;break}
-
-        # Do the old school HELO SMTP
-        "helo" {Invoke-SMTPD_HELO -Usercommand $UserInput;break}
-
-        # Do the new school EHLO SMTP
-        "ehlo" {Invoke-SMTPD_EHLO -Usercommand $UserInput;break}
-
-        # Verify the data the client sent us
-        "vrfy" {Invoke-SMTPD_VRFY -Usercommand $UserInput;break}
-        
-        # Do something about expanding.
-        "expn" {Invoke-SMTPD_EXPN -Usercommand $UserInput;break}
-        
-        # Everything is a bad syntax / command. Naughty naughty.
-        default {Write-VerboseLog 'Received a invalid command. Sending error';$ResponseMSG = "501 Syntax error, command unrecognized`r`n";$TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length);break}
-      }
-    } else {
-      # Why were we given an input thats less than 4 characters in length? WHYYYY
-      Write-VerboseLog 'Received a invalid command (less than 4 characters in length). Sending error'
-      $ResponseMSG = "500 Syntax error, command unrecognized`r`n";$TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
-    }
   }
 }
 
