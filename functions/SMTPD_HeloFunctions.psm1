@@ -60,20 +60,21 @@ Function Invoke-SMTPD_HELO {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
-            ValueFromPipeline = $true,
-            HelpMessage = 'The full command entered by the client')]
-        [String]
-        $UserCommand
+        [Parameter(Mandatory = $true, HelpMessage = 'The full command entered by the client')]
+        [String]$UserCommand,
+
+        [Parameter(Mandatory = $true, HelpMessage = 'The inbound TCP Data Stream from the client')]
+        [System.Net.Sockets.NetworkStream]$DataStream
     )
     Write-VerboseLog 'Received a HELO command.'
-    if ($UserInput.length -lt 5) {
+    if ($UserCommand.length -lt 5) {
         Write-VerboseLog 'HELO command was invalid'
         $ResponseMSG = "501 Requested action not taken: Syntax error`r`n"
-        $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
+        $DataStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
     }
     else {
-        $ResponseMSG = "250 Welcome " + $UserCommand.Substring(5, ($UserCommand.Length - 5)) + ". I am ready`r`n"
-        $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
+        $ClientHost = $UserCommand.Substring(5, ($UserCommand.Length - 5))
+        $ResponseMSG = "250 Welcome " + $ClientHost + ". I am ready`r`n"
+        $DataStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
     }
 }

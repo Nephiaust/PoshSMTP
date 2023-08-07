@@ -60,23 +60,25 @@ Function Invoke-SMTPD_EHLO {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
-            ValueFromPipeline = $true,
-            HelpMessage = 'The full command entered by the client')]
-        [String]
-        $UserCommand
+        [Parameter(Mandatory = $true, HelpMessage = 'The full command entered by the client')]
+        [String]$UserCommand,
+
+        [Parameter(Mandatory = $true, HelpMessage = 'The inbound TCP Data Stream from the client')]
+        [System.Net.Sockets.NetworkStream]$DataStream
     )
     Write-VerboseLog 'Received a EHLO command.'
-    if ($UserInput.length -lt 5) {
+    if ($UserCommand.length -lt 5) {
         Write-VerboseLog 'EHLO command was invalid'
         $ResponseMSG = "550 Requested action not taken: Syntax error`r`n"
-        $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
+        $DataStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
     }
     else {
-        $ResponseMSG = "250-" + $Settings.Server.Hostname + " welcomes " + $UserCommand.Substring(5, ($UserCommand.Length - 5)) + "`r`n"
+        $ClientHost = $UserCommand.Substring(5, ($UserCommand.Length - 5))
+        $AppDetails.MaxSize = $Settings.Server.MaxSizeKB.ToInt32($null) * 1024
+        $ResponseMSG = "250-" + $Settings.Server.Hostname + " welcomes " + $ClientHost + "`r`n"
         # If the max size has been set, tell the client what it is.
-        If ($Settings.Server.MaxSizeKB.ToInt32($null) -gt 0) { $ResponseMSG += "250-SIZE " + ($Settings.Server.MaxSizeKB.ToInt32($null) * 1024) + "`r`n" }
+        If ($Settings.Server.MaxSizeKB.ToInt32($null) -gt 0) { $ResponseMSG += "250-SIZE " + $AppDetails.MaxSize + "`r`n" }
         $ResponseMSG += "250 HELP`r`n"
-        $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
+        $DataStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
     }
 }

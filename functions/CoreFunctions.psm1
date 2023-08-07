@@ -111,16 +111,34 @@ Function Invoke-SMTPD_Start {
             Switch ($UserInput.substring(0, 4)) {
                 "help" {
                     Write-VerboseLog 'Received a HELP command. Sending help'
-                    $ResponseMSG = "200-Available commands in this context EHLO, EXPN, HELO, HELP, NOOP, QUIT, RSET, VRFY`r`n"
-                    $ResponseMSG += "200 Not available commands DATA, MAIL, RCPT`r`n"
+                    $ResponseMSG  = "200-Available commands in this context EHLO, EXPN, HELO, HELP, NOOP, QUIT, RSET, VRFY`r`n"
+                    $ResponseMSG += "200 Commands not avialable in this context DATA, MAIL, RCPT`r`n"
                     $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
                     break
                 }
                 "quit" { Invoke-SMTPD_QUIT -Usercommand $UserInput; $Continue = $false; break }
                 "rset" { Invoke-SMTPD_RSET -Usercommand $UserInput; break }
                 "noop" { Invoke-SMTPD_NOOP -Usercommand $UserInput; break }
-                "helo" { Invoke-SMTPD_HELO -Usercommand $UserInput; break }
-                "ehlo" { Invoke-SMTPD_EHLO -Usercommand $UserInput; break }
+                "helo" {
+                    if ($UserInput.length -lt 5) {
+                        Write-VerboseLog 'HELO command was invalid'
+                        $ResponseMSG = "501 Requested action not taken: Syntax error`r`n"
+                        $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
+                    } else {
+                        Invoke-SMTPD_HELO -Usercommand $UserInput -DataStream $TCPStream
+                    }
+                    break
+                }
+                "ehlo" {
+                    if ($UserInput.length -lt 5) {
+                        Write-VerboseLog 'EHLO command was invalid'
+                        $ResponseMSG = "501 Requested action not taken: Syntax error`r`n"
+                        $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
+                    } else {
+                        Invoke-SMTPD_EHLO -Usercommand $UserInput -DataStream $TCPStream
+                    }
+                    break
+                }
                 "vrfy" { Invoke-SMTPD_VRFY -Usercommand $UserInput; break }
                 "expn" { Invoke-SMTPD_EXPN -Usercommand $UserInput; break }
           
@@ -195,15 +213,14 @@ Function Invoke-SMTPD_RSET {
     .PARAMETER UserCommand
         [System.Switch]
         Does a full reset of the current context need to occur?
-    .NOTES
-        RSET must be by itself. RFC5321 says its SHOULD be, but we are being stupid about it.
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$false,HelpMessage='Is this a full reset, so all current client commands are cleared.')][Switch]$Full
+        [Parameter(HelpMessage='Is this a full reset, so all current client commands are cleared.')][Switch]$Full,
+        [Parameter(Mandatory=$true,HelpMessage='The full command entered by the client')][String]$UserCommand
     )
     Write-VerboseLog 'Received a RSET command. Doing nothing'
-    if ($UserInput.length -gt 4) {
+    if ($UserCommand.length -gt 4) {
         Write-VerboseLog 'RSET command was invalid'
         $ResponseMSG = "500 Syntax error, command unrecognized`r`n"
         $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
@@ -232,7 +249,7 @@ Function Invoke-SMTPD_QUIT {
         [Parameter(Mandatory=$true,HelpMessage='The full command entered by the client')][String]$UserCommand
     )
     Write-VerboseLog 'Received a QUIT command. Quiting session with client'
-    if ($UserInput.length -gt 4) {
+    if ($UserCommand.length -gt 4) {
         Write-VerboseLog 'QUIT command was invalid'
         $ResponseMSG = "500 Syntax error, command unrecognized`r`n"
         $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
