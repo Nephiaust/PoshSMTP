@@ -231,7 +231,7 @@ Function Invoke-SMTPD_RSET {
     }
     If ($Full) { Invoke-SMTPD_Start }
 }
-  
+
 Function Invoke-SMTPD_QUIT {
     <#
     .SYNOPSIS
@@ -287,4 +287,3 @@ Function Invoke-SMTPD_NOOP {
         $TCPStream.Write([System.Text.Encoding]::ASCII.GetBytes($ResponseMSG), 0, $ResponseMSG.Length)
     }
 }
-  

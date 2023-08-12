@@ -78,14 +78,14 @@ Function Show-StringCharacters{
     #>    
     [CmdletBinding()]
     param(
-      [Parameter(Mandatory=$true,
-                ValueFromPipeline=$true,
-                HelpMessage='The string to display as individual characters & value.')]
-      $String
+        [Parameter(Mandatory=$true,
+        ValueFromPipeline=$true,
+        HelpMessage='The string to display as individual characters & value.')]
+        $String
     )
     $TempChars = $String.ToCharArray()
     Foreach ($Character in $TempChars){
-      $LoggingOutput = "This This character is [[" + $Character + "] its value is [" + [Int32]$Character + "]"
-      Write-Host $LoggingOutput
+        $LoggingOutput = "This This character is [[" + $Character + "] its value is [" + [Int32]$Character + "]"
+        Write-Host $LoggingOutput
     }
-  }
+}
