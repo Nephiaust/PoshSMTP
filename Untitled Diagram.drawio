@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" modified="2023-09-20T05:33:06.392Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36" etag="9fQrXfffMtcZpv4qnWEB" version="21.7.5" type="github">
+  <diagram name="Page-1" id="azixTCh0Gs4hiSfiu0xy">
+    <mxGraphModel dx="1434" dy="758" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-1" value="" style="image;html=1;image=img/lib/clip_art/computers/Server_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="340" y="200" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-2" value="" style="image;html=1;image=img/lib/clip_art/computers/Laptop_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="320" y="450" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-3" value="" style="image;html=1;image=img/lib/clip_art/networking/Switch_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="130" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-4" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="0pKJk4CavUQhCiDcZkTv-3" target="0pKJk4CavUQhCiDcZkTv-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-5" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="0pKJk4CavUQhCiDcZkTv-3" target="0pKJk4CavUQhCiDcZkTv-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="420" as="sourcePoint" />
+            <mxPoint x="410" y="370" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="210" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-6" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="0pKJk4CavUQhCiDcZkTv-2" target="0pKJk4CavUQhCiDcZkTv-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-7" value="iLO" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="200" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-8" value="Network" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="290" y="290" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-9" value="&lt;h1&gt;For the iLO&lt;/h1&gt;&lt;p&gt;Set a random static IP address, or use DHCP for it.&amp;nbsp;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="110" width="190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-10" value="&lt;h1&gt;For the NICs&lt;/h1&gt;&lt;p&gt;Leave 1 plugged in, but its not needed for the most part&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="350" y="290" width="190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="0pKJk4CavUQhCiDcZkTv-11" value="&lt;h1&gt;Laptop&lt;/h1&gt;&lt;p&gt;If using a static IP for the iLO, grab a random IP from the network (just so its allocated to you) then set that as a static IP on the laptop. Then add a 2nd IP to match for the iLO.&lt;/p&gt;&lt;p&gt;Once setup, then you should be able to log into the iLO (with the administrator and password you set)&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="185" y="490" width="190" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
